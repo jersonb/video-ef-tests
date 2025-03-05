@@ -1,4 +1,5 @@
 using EntityFrameworkExercise.Data;
+using EntityFrameworkExercise.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ var services = builder.Services;
 var connectionString = configuration.GetConnectionString("StoreContext")
     ?? throw new InvalidOperationException("Connection string 'StoreContext' not found.");
 
-services.AddDbContext<StoreContext>(options =>
+services.AddDbContext<IStoreContext, StoreContext>(options =>
 {
     options.UseSqlite(connectionString, p =>
     {
@@ -18,6 +19,7 @@ services.AddDbContext<StoreContext>(options =>
     });
 });
 
+services.AddScoped<ICustomerService, CustomerService>();
 services.AddControllers();
 
 services.AddEndpointsApiExplorer();

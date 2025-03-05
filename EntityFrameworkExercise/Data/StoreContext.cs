@@ -1,9 +1,12 @@
-﻿using EntityFrameworkExercise.Models;
+﻿using System.Linq.Expressions;
+using EntityFrameworkExercise.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace EntityFrameworkExercise.Data;
 
-public class StoreContext(DbContextOptions<StoreContext> options) : DbContext(options)
+public class StoreContext(DbContextOptions<StoreContext> options)
+    : DbContext(options), IStoreContext
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,4 +24,17 @@ public class StoreContext(DbContextOptions<StoreContext> options) : DbContext(op
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<ProductSale> ProductsSales { get; set; } = default!;
+
+    public Expression<Func<Customer, bool>> SearhByTerm(string? searchTerm)
+    {
+        return c => searchTerm == null || EF.Functions.Like(c.Name.ToLower(), $"%{searchTerm.ToLower()}%");
+    }
+
+    public async Task ExecuteUpdate<TEntity>(Expression<Func<TEntity, bool>> predicate, Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertyCalls)
+        where TEntity : class
+    {
+        await Set<TEntity>()
+            .Where(predicate)
+            .ExecuteUpdateAsync(setPropertyCalls);
+    }
 }

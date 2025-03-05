@@ -1,44 +1,61 @@
-﻿using EntityFrameworkExercise.Data;
-using EntityFrameworkExercise.Models;
+﻿using EntityFrameworkExercise.Models;
+using EntityFrameworkExercise.Requests;
+using EntityFrameworkExercise.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EntityFrameworkExercise.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CustomersController(StoreContext context) : ControllerBase
+public class CustomersController(ICustomerService customerService) : ControllerBase
 {
-    // GET: api/Customers
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerListResult))]
+    public async Task<IActionResult> Get([FromQuery] CustomerQueryRequest query)
     {
-        return default;
+        var customers = await customerService.List(query);
+
+        return Ok(customers);
     }
 
-    // GET: api/Customers/5
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerResult))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Customer>> GetCustomer(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        return default;
+        var exists = await customerService.Exists(id);
+        if (exists)
+        {
+            var customer = await customerService.Get(id);
+            return Ok(customer);
+        }
+        return NotFound();
     }
 
-    // PUT: api/Customers/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCustomer(int id, Customer customer)
+    public async Task<IActionResult> Put(int id, CustomerPersistRequest request)
     {
-        return default;
+        var exists = await customerService.Exists(id);
+
+        if (exists)
+        {
+            request.Id = id;
+            await customerService.Update(request);
+            return NoContent();
+        }
+
+        return NotFound();
     }
 
-    // POST: api/Customers
     [HttpPost]
-    public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
+    public async Task<IActionResult> Post(CustomerPersistRequest request)
     {
-        return default;
+        int id = await customerService.Create(request);
+        return CreatedAtAction(nameof(Get), new { request.Id }, null);
     }
 
-    // DELETE: api/Customers/5
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCustomer(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         return default;
     }
