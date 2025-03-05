@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkExercise.Services;
 
-public class CustomerService(IStoreContext context) : ICustomerService
+public class CustomerService(StoreContext context) : ICustomerService
 {
     public async Task<CustomerListResult> List(CustomerSearch search)
     {
         var query = context.Customers
-               .Where(context.SearhByTerm(search.Term))
+               .Where(c => search.Term == null
+                          || EF.Functions.Like(c.Name.ToLower(), $"%{search.Term.ToLower()}%"))
                .OrderBy(c => c.Id)
                .Skip((search.Page - 1) * search.Size)
                .Take(search.Size)
@@ -61,10 +62,17 @@ public class CustomerService(IStoreContext context) : ICustomerService
     {
         Validate(customer);
 
-        await context.ExecuteUpdate<Customer>(
-            c => c.Id == customer.Id,
-            prop =>
+        await context.Customers
+            .Where(c => c.Id == customer.Id)
+            .ExecuteUpdateAsync(prop =>
                prop.SetProperty(c => c.Name, customer.Name));
+    }
+
+    public async Task Delete(int id)
+    {
+        await context.Customers
+            .Where(c => c.Id == id)
+            .ExecuteDeleteAsync();
     }
 
     private static void Validate(Customer customer)
@@ -86,6 +94,8 @@ public interface ICustomerService
     Task<int> Create(Customer customer);
 
     Task Update(Customer customer);
+
+    Task Delete(int id);
 }
 
 public class CustomerSearch

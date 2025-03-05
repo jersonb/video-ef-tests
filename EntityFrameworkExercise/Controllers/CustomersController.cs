@@ -1,5 +1,4 @@
-﻿using EntityFrameworkExercise.Models;
-using EntityFrameworkExercise.Requests;
+﻿using EntityFrameworkExercise.Requests;
 using EntityFrameworkExercise.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,14 +6,13 @@ namespace EntityFrameworkExercise.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CustomersController(ICustomerService customerService) : ControllerBase
+public class CustomersController(ICustomerService service) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerListResult))]
     public async Task<IActionResult> Get([FromQuery] CustomerQueryRequest query)
     {
-        var customers = await customerService.List(query);
-
+        var customers = await service.List(query);
         return Ok(customers);
     }
 
@@ -23,10 +21,10 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var exists = await customerService.Exists(id);
+        var exists = await service.Exists(id);
         if (exists)
         {
-            var customer = await customerService.Get(id);
+            var customer = await service.Get(id);
             return Ok(customer);
         }
         return NotFound();
@@ -35,12 +33,12 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, CustomerPersistRequest request)
     {
-        var exists = await customerService.Exists(id);
+        var exists = await service.Exists(id);
 
         if (exists)
         {
             request.Id = id;
-            await customerService.Update(request);
+            await service.Update(request);
             return NoContent();
         }
 
@@ -50,13 +48,14 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     [HttpPost]
     public async Task<IActionResult> Post(CustomerPersistRequest request)
     {
-        int id = await customerService.Create(request);
-        return CreatedAtAction(nameof(Get), new { request.Id }, null);
+        int id = await service.Create(request);
+        return CreatedAtAction(nameof(Get), new { id }, null);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        return default;
+        await service.Delete(id);
+        return Ok();
     }
 }

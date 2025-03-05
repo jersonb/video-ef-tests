@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Query;
 namespace EntityFrameworkExercise.Data;
 
 public class StoreContext(DbContextOptions<StoreContext> options)
-    : DbContext(options), IStoreContext
+    : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,16 +25,5 @@ public class StoreContext(DbContextOptions<StoreContext> options)
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<ProductSale> ProductsSales { get; set; } = default!;
 
-    public Expression<Func<Customer, bool>> SearhByTerm(string? searchTerm)
-    {
-        return c => searchTerm == null || EF.Functions.Like(c.Name.ToLower(), $"%{searchTerm.ToLower()}%");
-    }
-
-    public async Task ExecuteUpdate<TEntity>(Expression<Func<TEntity, bool>> predicate, Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertyCalls)
-        where TEntity : class
-    {
-        await Set<TEntity>()
-            .Where(predicate)
-            .ExecuteUpdateAsync(setPropertyCalls);
-    }
+   
 }
