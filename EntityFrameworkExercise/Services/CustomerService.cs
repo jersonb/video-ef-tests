@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkExercise.Services;
 
-public class CustomerService(StoreContext context) : ICustomerService
+public class CustomerService(IStoreContext context) : ICustomerService
 {
     public async Task<CustomerListResult> List(CustomerSearch search)
     {

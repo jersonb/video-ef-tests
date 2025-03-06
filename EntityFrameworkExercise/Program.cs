@@ -11,7 +11,7 @@ var services = builder.Services;
 var connectionString = configuration.GetConnectionString("StoreContext")
     ?? throw new InvalidOperationException("Connection string 'StoreContext' not found.");
 
-services.AddDbContext<StoreContext>(options =>
+services.AddDbContext<IStoreContext, StoreContext>(options =>
 {
     options.UseSqlite(connectionString, p =>
     {

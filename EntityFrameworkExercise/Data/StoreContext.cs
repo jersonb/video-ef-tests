@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EntityFrameworkExercise.Data;
 
 public class StoreContext(DbContextOptions<StoreContext> options)
-    : DbContext(options)
+    : DbContext(options), IStoreContext
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,4 +22,15 @@ public class StoreContext(DbContextOptions<StoreContext> options)
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<ProductSale> ProductsSales { get; set; } = default!;
+}
+
+public interface IStoreContext
+{
+    DbSet<Seller> Sellers { get; set; }
+    DbSet<Sale> Sales { get; set; }
+    DbSet<Customer> Customers { get; set; }
+    DbSet<Product> Products { get; set; }
+    DbSet<ProductSale> ProductsSales { get; set; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

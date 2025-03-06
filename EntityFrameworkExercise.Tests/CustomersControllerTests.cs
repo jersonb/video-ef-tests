@@ -10,7 +10,7 @@ namespace EntityFrameworkExercise.Tests;
 public class CustomersControllerTests
 {
     [Fact]
-    public async Task GetResultOk()
+    public async Task GetOk()
     {
         var service = new Mock<ICustomerService>();
 
@@ -24,7 +24,7 @@ public class CustomersControllerTests
     }
 
     [Fact]
-    public async Task GetByIdResultOk()
+    public async Task GetByIdOk()
     {
         var service = new Mock<ICustomerService>();
 
@@ -42,7 +42,7 @@ public class CustomersControllerTests
     }
 
     [Fact]
-    public async Task GetByIdResultNotFound()
+    public async Task GetByIdNotFound()
     {
         var service = new Mock<ICustomerService>();
 
