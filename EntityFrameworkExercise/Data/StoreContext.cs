@@ -2,6 +2,7 @@
 using EntityFrameworkExercise.Models;
 using EntityFrameworkExercise.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace EntityFrameworkExercise.Data;
 
@@ -30,6 +31,20 @@ public class StoreContext(DbContextOptions<StoreContext> options)
         return c => search.Term == null
                                   || EF.Functions.Like(c.Name.ToLower(), $"%{search.Term.ToLower()}%");
     }
+
+    public async Task ExecuteUpdate<TEntity>(Expression<Func<TEntity, bool>> predicate, Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertyCalls) where TEntity : class
+    {
+        await Set<TEntity>()
+            .Where(predicate)
+            .ExecuteUpdateAsync(setPropertyCalls);
+    }
+
+    public async Task ExecuteDelete<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class
+    {
+        await Set<TEntity>()
+            .Where(predicate)
+            .ExecuteDeleteAsync();
+    }
 }
 
 public interface IStoreContext
@@ -40,6 +55,10 @@ public interface IStoreContext
     DbSet<Product> Products { get; set; }
     DbSet<ProductSale> ProductsSales { get; set; }
 
+    Task ExecuteDelete<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class;
+    Task ExecuteUpdate<TEntity>(Expression<Func<TEntity, bool>> predicate, Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> setPropertyCalls) where TEntity : class;
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
     Expression<Func<Customer, bool>> SearchCustomerName(CustomerSearch search);
 }

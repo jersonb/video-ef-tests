@@ -1,6 +1,8 @@
-﻿using EntityFrameworkExercise.Data;
+﻿using System.Linq.Expressions;
+using EntityFrameworkExercise.Data;
 using EntityFrameworkExercise.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace EntityFrameworkExercise.Services;
 
@@ -59,17 +61,15 @@ public class CustomerService(IStoreContext context) : ICustomerService
     {
         Validate(customer);
 
-        await context.Customers
-            .Where(c => c.Id == customer.Id)
-            .ExecuteUpdateAsync(prop =>
-               prop.SetProperty(c => c.Name, customer.Name));
+        await context.ExecuteUpdate<Customer>(
+            c => c.Id == customer.Id,
+            prop => prop
+                .SetProperty(c => c.Name, customer.Name));
     }
 
     public async Task Delete(int id)
     {
-        await context.Customers
-            .Where(c => c.Id == id)
-            .ExecuteDeleteAsync();
+        await context.ExecuteDelete<Customer>((c => c.Id == id));
     }
 
     private static void Validate(Customer customer)
