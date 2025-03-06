@@ -1,7 +1,5 @@
-﻿using System.Linq.Expressions;
-using EntityFrameworkExercise.Models;
+﻿using EntityFrameworkExercise.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace EntityFrameworkExercise.Data;
 
@@ -24,6 +22,4 @@ public class StoreContext(DbContextOptions<StoreContext> options)
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<ProductSale> ProductsSales { get; set; } = default!;
-
-   
 }

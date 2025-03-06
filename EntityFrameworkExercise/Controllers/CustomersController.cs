@@ -16,9 +16,9 @@ public class CustomersController(ICustomerService service) : ControllerBase
         return Ok(customers);
     }
 
+    [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerResult))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
         var exists = await service.Exists(id);
@@ -31,6 +31,8 @@ public class CustomersController(ICustomerService service) : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put(int id, CustomerPersistRequest request)
     {
         var exists = await service.Exists(id);
@@ -46,6 +48,7 @@ public class CustomersController(ICustomerService service) : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Post(CustomerPersistRequest request)
     {
         int id = await service.Create(request);
@@ -53,6 +56,7 @@ public class CustomersController(ICustomerService service) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(int id)
     {
         await service.Delete(id);

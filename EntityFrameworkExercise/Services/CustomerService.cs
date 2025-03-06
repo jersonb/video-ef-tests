@@ -21,8 +21,7 @@ public class CustomerService(StoreContext context) : ICustomerService
                    SalesCount = c.Sales.Count
                });
 
-        var customers = await query
-            .ToListAsync();
+        var customers = await query.ToListAsync();
 
         return new(customers);
     }
@@ -38,8 +37,7 @@ public class CustomerService(StoreContext context) : ICustomerService
                  Sales = c.Sales.Select(s => new CustomerSaleResult(s.Id, s.Date))
              });
 
-        var customer = await query
-               .SingleAsync();
+        var customer = await query.SingleAsync();
         return customer;
     }
 
