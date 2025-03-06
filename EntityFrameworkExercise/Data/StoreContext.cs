@@ -1,4 +1,6 @@
-﻿using EntityFrameworkExercise.Models;
+﻿using System.Linq.Expressions;
+using EntityFrameworkExercise.Models;
+using EntityFrameworkExercise.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkExercise.Data;
@@ -22,6 +24,12 @@ public class StoreContext(DbContextOptions<StoreContext> options)
     public DbSet<Customer> Customers { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<ProductSale> ProductsSales { get; set; } = default!;
+
+    public Expression<Func<Customer, bool>> SearchCustomerName(CustomerSearch search)
+    {
+        return c => search.Term == null
+                                  || EF.Functions.Like(c.Name.ToLower(), $"%{search.Term.ToLower()}%");
+    }
 }
 
 public interface IStoreContext
@@ -33,4 +41,5 @@ public interface IStoreContext
     DbSet<ProductSale> ProductsSales { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Expression<Func<Customer, bool>> SearchCustomerName(CustomerSearch search);
 }

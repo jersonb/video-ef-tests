@@ -9,8 +9,7 @@ public class CustomerService(IStoreContext context) : ICustomerService
     public async Task<CustomerListResult> List(CustomerSearch search)
     {
         var query = context.Customers
-               .Where(c => search.Term == null
-                          || EF.Functions.Like(c.Name.ToLower(), $"%{search.Term.ToLower()}%"))
+               .Where(context.SearchCustomerName(search))
                .OrderBy(c => c.Id)
                .Skip((search.Page - 1) * search.Size)
                .Take(search.Size)
